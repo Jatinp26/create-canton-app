@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Scaffold Canton Network/Daml projects in seconds",
   "main": "bin/create-canton-app.js",
-  "bin": {
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jatinp26/create-canton-app.git"
+  },
+    "bin": {
     "create-canton-app": "./bin/create-canton-app.js",
     "canton-dev": "./bin/create-canton-app.js"
   },
