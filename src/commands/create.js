@@ -14,8 +14,121 @@ const colors = {
   bold: (text) => `\x1b[1m${text}\x1b[0m`
 };
 
+// Check if Daml SDK is installed
+function isDamlInstalled() {
+  return shell.which('daml') !== null;
+}
+
+// Get Daml version
+function getDamlVersion() {
+  try {
+    const result = shell.exec('daml version', { silent: true });
+    const match = result.stdout.match(/(\d+\.\d+\.\d+)/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+// Install Daml SDK automatically
+async function installDamlSDK() {
+  console.log('');
+  console.log(colors.yellow('⚠️  Daml SDK not found!'));
+  console.log('');
+  console.log(colors.white('Daml SDK is required to compile Canton smart contracts.'));
+  console.log('');
+  
+  const answers = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'installDaml',
+      message: 'Would you like to install Daml SDK now? (Recommended)',
+      default: true
+    }
+  ]);
+
+  if (!answers.installDaml) {
+    console.log('');
+    console.log(colors.yellow('⚠️  Skipping Daml SDK installation.'));
+    console.log(colors.dim('You can install it later with:'));
+    console.log(colors.white('  curl -sSL https://get.daml.com/ | sh'));
+    console.log('');
+    return false;
+  }
+
+  console.log('');
+  const spinner = ora('Installing Daml SDK (this may take a few minutes)...').start();
+
+  try {
+    // Install Daml SDK
+    const result = shell.exec('curl -sSL https://get.daml.com/ | sh', { 
+      silent: true 
+    });
+
+    if (result.code !== 0) {
+      spinner.fail(colors.red('Failed to install Daml SDK'));
+      console.log('');
+      console.log(colors.red('Error:'), result.stderr);
+      console.log('');
+      console.log(colors.yellow('Please install manually:'));
+      console.log(colors.white('  curl -sSL https://get.daml.com/ | sh'));
+      console.log('');
+      return false;
+    }
+
+    // Add to PATH for current session
+    const damlPath = path.join(process.env.HOME, '.daml', 'bin');
+    process.env.PATH = `${damlPath}:${process.env.PATH}`;
+
+    spinner.succeed(colors.green('✨ Daml SDK installed successfully!'));
+    
+    console.log('');
+    console.log(colors.cyan('📝 Important: Add Daml to your PATH permanently'));
+    console.log(colors.dim('Add this line to your ~/.zshrc or ~/.bashrc:'));
+    console.log('');
+    console.log(colors.white(`  export PATH="$HOME/.daml/bin:$PATH"`));
+    console.log('');
+    console.log(colors.dim('Then reload your shell:'));
+    console.log(colors.white('  source ~/.zshrc'));
+    console.log('');
+
+    return true;
+  } catch (error) {
+    spinner.fail(colors.red('Installation failed: ' + error.message));
+    return false;
+  }
+}
+
 async function create(projectName, options) {
   try {
+    // Check prerequisites BEFORE asking for project details
+    console.log('');
+    console.log(colors.cyan('🔍 Checking prerequisites...'));
+    console.log('');
+
+    // Check Daml SDK
+    if (!isDamlInstalled()) {
+      const installed = await installDamlSDK();
+      if (!installed) {
+        console.log(colors.yellow('⚠️  Continuing without Daml SDK...'));
+        console.log(colors.dim('You can still create the project, but won\'t be able to compile until Daml is installed.'));
+        console.log('');
+      }
+    } else {
+      const version = getDamlVersion();
+      console.log(colors.green(`✅ Daml SDK found${version ? ` (v${version})` : ''}`));
+    }
+
+    // Check Java (just informational)
+    if (!shell.which('java')) {
+      console.log(colors.yellow('⚠️  Java not found (optional, needed for tests)'));
+    } else {
+      console.log(colors.green('✅ Java Runtime found'));
+    }
+
+    console.log('');
+
+    // Now proceed with project creation
     if (!projectName) {
       const answers = await inquirer.prompt([
         {
@@ -75,12 +188,22 @@ async function create(projectName, options) {
 
     spinner.succeed(colors.green('✨ Project created successfully!'));
 
+    // Show next steps
     console.log('');
     console.log(colors.cyan(colors.bold('📚 Next steps:')));
     console.log('');
     console.log(colors.white(`  cd ${projectName}`));
-    console.log(colors.white(`  daml build          ${colors.dim('# Compile your contracts')}`));
-    console.log(colors.white(`  daml test           ${colors.dim('# Run tests')}`));
+    
+    if (isDamlInstalled()) {
+      console.log(colors.white(`  daml build          ${colors.dim('# Compile your contracts')}`));
+      console.log(colors.white(`  daml test           ${colors.dim('# Run tests')}`));
+    } else {
+      console.log(colors.yellow(`  # First, install Daml SDK:`));
+      console.log(colors.white(`  curl -sSL https://get.daml.com/ | sh`));
+      console.log(colors.white(`  source ~/.zshrc`));
+      console.log(colors.white(`  daml build`));
+    }
+    
     console.log('');
     console.log(colors.dim('📖 Read README.md for more information'));
     console.log('');
@@ -110,7 +233,6 @@ daml test
 }
 
 function createConfig(projectPath, projectName) {
-  // THE FIX: Added daml-script dependency!
   const damlConfig = `sdk-version: 3.4.9
 name: ${projectName}
 source: daml
@@ -148,6 +270,16 @@ daml build
 
 # Run tests
 daml test
+\`\`\`
+
+## Prerequisites
+
+If you don't have Daml SDK installed, the CLI will offer to install it automatically.
+
+Or install manually:
+
+\`\`\`bash
+curl -sSL https://get.daml.com/ | sh
 \`\`\`
 
 ## Learn More

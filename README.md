@@ -8,7 +8,6 @@ Scaffold Canton Network Daml projects in seconds. A CLI tool to quickly bootstra
 
 ## Requirements
 - Node.js v16+
-- Daml SDK v3.4.9+
 - Java Runtime (for tests)
 
 ## Quick Start
