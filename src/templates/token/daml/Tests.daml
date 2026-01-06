@@ -1,0 +1,67 @@
+-- Tests.daml
+-- Test suite for the Token contract
+
+module Tests where
+
+import Daml.Script
+import Token
+
+-- Test: Token creation
+testTokenCreation : Script ()
+testTokenCreation = script do
+  alice <- allocateParty "Alice"
+  issuer <- allocateParty "Issuer"
+
+  token <- submit issuer do
+    createCmd Token with
+      issuer = issuer
+      owner = alice
+      amount = 100.0
+      symbol = "TEST"
+
+  Some tokenData <- queryContractId alice token
+  assert (tokenData.amount == 100.0)
+  assert (tokenData.symbol == "TEST")
+
+-- Test: Token transfer
+testTokenTransfer : Script ()
+testTokenTransfer = script do
+  alice <- allocateParty "Alice"
+  bob <- allocateParty "Bob"
+  issuer <- allocateParty "Issuer"
+
+  token <- submit issuer do
+    createCmd Token with
+      issuer = issuer
+      owner = alice
+      amount = 50.0
+      symbol = "TEST"
+
+  newToken <- submit alice do
+    exerciseCmd token Transfer with newOwner = bob
+
+  Some tokenData <- queryContractId bob newToken
+  assert (tokenData.owner == bob)
+  assert (tokenData.amount == 50.0)
+
+-- Test: Token split
+testTokenSplit : Script ()
+testTokenSplit = script do
+  alice <- allocateParty "Alice"
+  issuer <- allocateParty "Issuer"
+
+  token <- submit issuer do
+    createCmd Token with
+      issuer = issuer
+      owner = alice
+      amount = 100.0
+      symbol = "TEST"
+
+  (token1, token2) <- submit alice do
+    exerciseCmd token Split with splitAmount = 30.0
+
+  Some data1 <- queryContractId alice token1
+  Some data2 <- queryContractId alice token2
+  
+  assert (data1.amount == 30.0)
+  assert (data2.amount == 70.0)

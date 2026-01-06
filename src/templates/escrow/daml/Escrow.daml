@@ -1,0 +1,53 @@
+-- Escrow.daml
+-- A two-party escrow with an arbiter
+
+module Escrow where
+
+import Daml.Script
+
+template EscrowAgreement
+  with
+    buyer : Party
+    seller : Party
+    arbiter : Party
+    amount : Decimal
+    description : Text
+  where
+    signatory buyer, seller, arbiter
+
+    choice Release : ()
+      controller buyer
+      do
+        return ()
+
+    choice Dispute : ()
+      with
+        decision : Text
+      controller arbiter
+      do
+        return ()
+
+    choice Cancel : ()
+      controller buyer, seller
+      do
+        return ()
+
+setup : Script ()
+setup = script do
+  alice <- allocateParty "Alice"
+  bob <- allocateParty "Bob"
+  charlie <- allocateParty "Charlie"
+
+  escrow <- submit alice do
+    submitMulti [alice, bob, charlie] [] do
+      createCmd EscrowAgreement with
+        buyer = alice
+        seller = bob
+        arbiter = charlie
+        amount = 1000.0
+        description = "Laptop purchase"
+
+  submit alice do
+    exerciseCmd escrow Release
+
+  return ()

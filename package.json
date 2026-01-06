@@ -1,0 +1,28 @@
+{
+  "name": "create-canton-app",
+  "version": "1.0.0",
+  "description": "Scaffold Canton Network/Daml projects in seconds",
+  "main": "bin/create-canton-app.js",
+  "bin": {
+    "create-canton-app": "./bin/create-canton-app.js",
+    "canton-dev": "./bin/create-canton-app.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "canton",
+    "daml",
+    "blockchain"
+  ],
+  "author": "Jatin Pandya <Jatin@canton.foundation>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "8.2.6",
+    "ora": "5.4.1",
+    "shelljs": "^0.8.5"
+  }
+}
