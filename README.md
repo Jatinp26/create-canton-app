@@ -15,8 +15,10 @@ Scaffold Canton Network Daml projects in seconds. A CLI tool to quickly bootstra
 ### Create Your First Canton dApp
 
 ```bash
-npx create-canton-app my-first-dapp
+npx create-canton-app
 ```
+
+> Follow the Instructions and select the desired template.
 
 ### Build and Test
 
@@ -71,7 +73,6 @@ choices: [
 4. Try it
 
 ```bash
-cd test-my-template
 daml build
 daml test
 ```
