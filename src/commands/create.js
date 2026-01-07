@@ -14,12 +14,10 @@ const colors = {
   bold: (text) => `\x1b[1m${text}\x1b[0m`
 };
 
-// Check if Daml SDK is installed
 function isDamlInstalled() {
   return shell.which('daml') !== null;
 }
 
-// Get Daml version
 function getDamlVersion() {
   try {
     const result = shell.exec('daml version', { silent: true });
@@ -30,7 +28,6 @@ function getDamlVersion() {
   }
 }
 
-// Install Daml SDK automatically
 async function installDamlSDK() {
   console.log('');
   console.log(colors.yellow('⚠️  Daml SDK not found!'));
@@ -60,15 +57,10 @@ async function installDamlSDK() {
   const spinner = ora('Installing Daml SDK (this may take a few minutes)...').start();
 
   try {
-    // Install Daml SDK
-    const result = shell.exec('curl -sSL https://get.daml.com/ | sh', { 
-      silent: true 
-    });
+    const result = shell.exec('curl -sSL https://get.daml.com/ | sh', { silent: true });
 
     if (result.code !== 0) {
       spinner.fail(colors.red('Failed to install Daml SDK'));
-      console.log('');
-      console.log(colors.red('Error:'), result.stderr);
       console.log('');
       console.log(colors.yellow('Please install manually:'));
       console.log(colors.white('  curl -sSL https://get.daml.com/ | sh'));
@@ -76,7 +68,6 @@ async function installDamlSDK() {
       return false;
     }
 
-    // Add to PATH for current session
     const damlPath = path.join(process.env.HOME, '.daml', 'bin');
     process.env.PATH = `${damlPath}:${process.env.PATH}`;
 
@@ -88,9 +79,6 @@ async function installDamlSDK() {
     console.log('');
     console.log(colors.white(`  export PATH="$HOME/.daml/bin:$PATH"`));
     console.log('');
-    console.log(colors.dim('Then reload your shell:'));
-    console.log(colors.white('  source ~/.zshrc'));
-    console.log('');
 
     return true;
   } catch (error) {
@@ -101,17 +89,15 @@ async function installDamlSDK() {
 
 async function create(projectName, options) {
   try {
-    // Check prerequisites BEFORE asking for project details
+    // Check prerequisites
     console.log('');
     console.log(colors.cyan('🔍 Checking prerequisites...'));
     console.log('');
 
-    // Check Daml SDK
     if (!isDamlInstalled()) {
       const installed = await installDamlSDK();
       if (!installed) {
         console.log(colors.yellow('⚠️  Continuing without Daml SDK...'));
-        console.log(colors.dim('You can still create the project, but won\'t be able to compile until Daml is installed.'));
         console.log('');
       }
     } else {
@@ -119,7 +105,6 @@ async function create(projectName, options) {
       console.log(colors.green(`✅ Daml SDK found${version ? ` (v${version})` : ''}`));
     }
 
-    // Check Java (just informational)
     if (!shell.which('java')) {
       console.log(colors.yellow('⚠️  Java not found (optional, needed for tests)'));
     } else {
@@ -128,7 +113,7 @@ async function create(projectName, options) {
 
     console.log('');
 
-    // Now proceed with project creation
+    // Get project name
     if (!projectName) {
       const answers = await inquirer.prompt([
         {
@@ -141,17 +126,22 @@ async function create(projectName, options) {
       projectName = answers.projectName;
     }
 
+    // FIXED: Always ask for template if not explicitly provided via CLI flag
     let template = options.template;
-    if (!template) {
+    
+    // Check if template was explicitly provided (not just the default)
+    const wasTemplateProvided = process.argv.includes('--template') || process.argv.includes('-t');
+    
+    if (!wasTemplateProvided) {
       const answers = await inquirer.prompt([
         {
           type: 'list',
           name: 'template',
           message: 'Which template would you like to use?',
           choices: [
-            { name: '🪙  Token Contract (fungible token like ERC20)', value: 'token' },
-            { name: '🤝  Escrow Contract (multi-party escrow)', value: 'escrow' },
-            { name: '📄  Empty Template (blank starter)', value: 'empty' }
+            { name: 'Token Contract (fungible token like ERC20)', value: 'token' },
+            { name: 'Escrow Contract (multi-party escrow)', value: 'escrow' },
+            { name: 'Empty Template (blank starter)', value: 'empty' }
           ]
         }
       ]);
@@ -188,7 +178,6 @@ async function create(projectName, options) {
 
     spinner.succeed(colors.green('✨ Project created successfully!'));
 
-    // Show next steps
     console.log('');
     console.log(colors.cyan(colors.bold('📚 Next steps:')));
     console.log('');
@@ -200,8 +189,6 @@ async function create(projectName, options) {
     } else {
       console.log(colors.yellow(`  # First, install Daml SDK:`));
       console.log(colors.white(`  curl -sSL https://get.daml.com/ | sh`));
-      console.log(colors.white(`  source ~/.zshrc`));
-      console.log(colors.white(`  daml build`));
     }
     
     console.log('');
@@ -270,16 +257,6 @@ daml build
 
 # Run tests
 daml test
-\`\`\`
-
-## Prerequisites
-
-If you don't have Daml SDK installed, the CLI will offer to install it automatically.
-
-Or install manually:
-
-\`\`\`bash
-curl -sSL https://get.daml.com/ | sh
 \`\`\`
 
 ## Learn More
