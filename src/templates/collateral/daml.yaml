@@ -1,0 +1,16 @@
+sdk-version: 1.7.0
+name: ex-collateral
+version: 1.0.0
+source: daml/Test.daml
+parties:
+- Operator
+- BankA
+- BankB
+- RatingAgency
+- MarketDataProvider
+exposed-modules:
+- Main
+dependencies:
+- daml-prim
+- daml-stdlib
+- daml-script

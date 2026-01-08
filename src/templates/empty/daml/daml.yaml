@@ -1,0 +1,13 @@
+# Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+sdk-version: 3.4.9
+name: Empty
+source: daml/Main.daml
+parties:
+  - Alice
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script

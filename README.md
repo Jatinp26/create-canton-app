@@ -60,9 +60,9 @@ Edit `src/commands/create.js` line 43:
 
 ```javascript
 choices: [
-  { name: 'Token Contract', value: 'token' },
+  { name: 'Bond Trading', value: 'bondtrading' },
 
-  { name: 'Escrow Contract', value: 'escrow' },
+  { name: 'Collateral Master', value: 'collateral' },
 
   { name: 'My Template', value: 'my-template' }, // ADD THIS
 

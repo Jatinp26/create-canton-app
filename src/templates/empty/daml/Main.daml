@@ -2,7 +2,6 @@
 -- Your Canton smart contract starts here!
 
 module Main where
-
 import Daml.Script
 
 template MyContract

@@ -139,8 +139,8 @@ async function create(projectName, options) {
           name: 'template',
           message: 'Which template would you like to use?',
           choices: [
-            { name: 'Token Contract (fungible token like ERC20)', value: 'token' },
-            { name: 'Escrow Contract (multi-party escrow)', value: 'escrow' },
+            { name: 'Bond Trading', value: 'bondtrading' },
+            { name: 'Collateral Master', value: 'collateral' },
             { name: 'Empty Template (blank starter)', value: 'empty' }
           ]
         }
