@@ -139,9 +139,9 @@ async function create(projectName, options) {
           name: 'template',
           message: 'Which template would you like to use?',
           choices: [
-            { name: 'Bond Trading', value: 'bondtrading' },
-            { name: 'Collateral Master', value: 'collateral' },
-            { name: 'Empty Template (blank starter)', value: 'empty' }
+            { name: 'Token Transfer System Template', value: 'TokenTransfer' },
+            { name: 'Multi-Party Agreement System Template', value: 'Multiparty' },
+            { name: 'Asset Holding System Template', value: 'AssetOwner' }
           ]
         }
       ]);

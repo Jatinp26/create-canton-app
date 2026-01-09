@@ -1,0 +1,15 @@
+# Multi-Party Agreement System for Canton Network
+# SPDX-License-Identifier: Apache-2.0
+
+sdk-version: 3.4.9
+name: MultiPartyAgreement
+source: daml/MultiPartyAgreement.daml
+parties:
+  - Alice
+  - Bob
+  - Charlie
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
