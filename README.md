@@ -60,13 +60,13 @@ Edit `src/commands/create.js` line 43:
 
 ```javascript
 choices: [
-  { name: 'Bond Trading', value: 'bondtrading' },
+  { name: 'Token Transfer System Template', value: 'TokenTransfer' },
 
-  { name: 'Collateral Master', value: 'collateral' },
+  { name: 'Multi-Party Agreement System Template', value: 'Multiparty' },
+
+  { name: 'Asset Holding System Template', value: 'AssetOwner' }
 
   { name: 'My Template', value: 'my-template' }, // ADD THIS
-
-  { name: '📄 Empty Template', value: 'empty' }
 ]
 ```
 
