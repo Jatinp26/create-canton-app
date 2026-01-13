@@ -24,8 +24,8 @@ npx create-canton-app
 
 ```bash
 cd my-first-dapp
-daml build
-daml test
+dpm build
+dpm test
 ```
 
 **That's it!** You now have a working Canton smart contract.
@@ -73,17 +73,16 @@ choices: [
 4. Try it
 
 ```bash
-daml build
-daml test
+dpm build
+dpm test
 ```
 
 ## Template Checklist
 
-- [ ] Compiles with `daml build`
-- [ ] Tests pass with `daml test`
+- [ ] Compiles with `dpm build`
+- [ ] Tests pass with `dpm test`
 - [ ] Includes inline comments
 - [ ] Has clear use case
-- [ ] daml.yaml includes `daml-script` dependency
 
 <div align="center">
 
